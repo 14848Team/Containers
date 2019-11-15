@@ -1,0 +1,5 @@
+#!/usr/bin/python3
+
+print("tiny-1-1.cfg")
+print("tiny-2-2.cfg")
+print("tiny-3-3.cfg")

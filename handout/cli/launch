@@ -1,0 +1,22 @@
+#!/usr/bin/python3
+import requests, json, os, sys
+
+HOSTNAME = "localhost"
+PORT = "8080"
+
+url = "http://" + HOSTNAME + ":" + PORT + "/launch"
+
+launch_data = {
+    "name": sys.argv[1],
+    "major": sys.argv[2],
+    "minor": sys.argv[3]
+}
+
+response = requests.post(url, json=launch_data)
+
+if(response.status_code == 200):
+    return_data = response.json()
+    print("Success: " + return_data["instance"])
+else:
+    print("Failure: Have better error checking than this sample pls")
+

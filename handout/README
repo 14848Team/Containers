@@ -1,0 +1,14 @@
+API.md
+ - specifies the REST interface to the manager
+
+base_images/
+ - contains the .tar files to be used to layout the filesystem for the container
+
+mountables/
+ - contains the .tar files used in mounting step
+
+grading/rest
+ - contains the grading script which uses the REST API to test your system
+
+grading/cli_tests
+ - contains the grading scripts which uses the CLI to test your system

@@ -1,0 +1,4 @@
+#!/usr/bin/python3
+
+print("fake instance name")
+print("another fake instance name")

@@ -82,7 +82,8 @@ def launch_container():
                                                          major,
                                                          minor))) as fp:
         config_obj = json.load(fp)
-
+    for mount_argv in config_obj["mounts"]:
+        execute_mount(mount_argv, image_dir)
     subprocess = Process(target=start_container, args=(image_dir, config_obj))
     subprocess_dict[instance_name] = subprocess
     subprocess.start()
@@ -122,6 +123,26 @@ def start_container(image_dir, config_obj):
     os.chroot(image_dir)
     os.chdir('/')
     os.system('export {}'.format(config_obj['startup_env']))
+
+def execute_mount(mount_argv, image_dir):
+    file = mount_argv.split(" ")[0]
+    file_floder = file.split(".")[0]
+    floder = mount_argv.split(" ")[1]
+    access = mount_argv.split(" ")[2]
+    mountables_path = osp.join(os.getcwd(), "mountables")
+    file_path = osp.join(mountables_path, file)
+    file_floder_path = osp.join(mountables_path, file_floder)
+    floder_path = osp.join(image_dir, floder)
+    if not osp.exists(floder_path):
+        os.system('sudo mkdir {}'.format(floder_path))
+    if not osp.exists(file_floder_path):
+        os.system('tar -xf {} -C {}'.format(file_path, mountables_path))
+    if access == "READ":
+        os.system('sudo mount --bind -o ro {} {}'.format(file_floder_path, floder_path))
+    else:
+        os.system('sudo mount --bind -o rw {} {}'.format(file_floder_path, floder_path))
+
+
 
 
 if __name__ == '__main__':

@@ -1,0 +1,121 @@
+    1  ls
+    2  ./ vmware-tools-upgrader-
+    3  ./ vmware-tools-upgrader-64
+    4  ls
+    5  ./vmware-tools-upgrader-64 
+    6  ./run_upgrader.sh 
+    7  sudo sh run_upgrader.sh 
+    8  cp VMwareTools-10.3.10-13959562.tar.gz ~
+    9  cd ~
+   10  ls
+   11  cd vmware-tools-distrib/
+   12  ls
+   13  ./vmware-install.pl 
+   14  sudo ./vmware-install.pl 
+   15  ls
+   16  cd 14848-f19-p3/
+   17  ls
+   18  cd handout/
+   19  ls
+   20  history 
+   21  ls
+   22  history -h
+   23  ls
+   24  cd ..
+   25  ls
+   26  nohup ./pycharm-2019.2.4/bin/pycharm.sh &
+   27  ls
+   28  history
+   29  ls
+   30  history
+   31  ls
+   32  history
+   33  nohup ./pycharm-2019.2.4/bin/pycharm.sh &
+   34  ssh-keygen 
+   35  cat .ssh/id_rsa.pub 
+   36  ls
+   37  sublime_text_3/sublime_text &
+   38  ls
+   39  /bin/bash 
+   40  history
+   41  cat .bash_history 
+   42  cat ~/.bash_history 
+   43  wget https://github.com/ericchiang/containers-from-scratch/releases/download/v0.1.0/rootfs.tar.gz
+   44  history
+   45  sha256sum rootfs.tar.gz 
+   46  sudo tar -zxf rootfs.tar.gz 
+   47  ls
+   48  cd rootfs/
+   49  ls
+   50  history
+   51  cd ..
+   52  cat .bash_history 
+   53  ls
+   54  ls rootfs
+   55  ls -al rootfs/bin/ls
+   56  sudo chroot rootfs /bin/bash
+   57  ls
+   58  sudo chroot rootfs
+   59  ls
+   60  history
+   61  sudo chroot rootfs python -m SimpleHTTPServer
+   62  sudo chroot rootfs /usr/bin/python -m SimpleHTTPServer
+   63  ps aux
+   64  USER       PID %CPU %MEM 
+   65  history
+   66  ps aux | grep /bin/bash | grep root
+   67  sudo ls -l /proc/7485
+   68  sudo ls -l /proc/7485/ns
+   69  ps aux | grep /bin/bash | grep root
+   70  sudo ls -l /proc/7626/ns
+   71  sudo nsenter --pid=/proc/7626/ns/pid unshare -f --mount-proc=$PWD/rootfs/proc chroot rootfs /bin/bash
+   72  sudo umount $PWD/rootfs/var/readonlyfiles
+   73  ps aux
+   74  ls /sys/fs/cgroup/
+   75  sudo su
+   76  sudo rmdir /sys/fs/cgroup/memory/demo
+   77  go
+   78  sudo apt install golang-go
+   79  go
+   80  getcap listen
+   81  getcap
+   82  sudo setcap cap_net_bind_service=+ep listen
+   83  getcap listen
+   84  touch listen.go
+   85  go build -o listen listen.go
+   86  ./listen
+   87  sudo setcap cap_net_bind_service=+ep listen
+   88  getcap listen
+   89  ./listen
+   90  sudo su
+   91  history
+   92  history
+   93  top
+   94  history
+   95  sudo chroot rootfs /bin/bash
+   96  sudo unshare -p -f --mount-proc=$PWD/rootfs/proc     chroot rootfs /bin/bash
+   97  ps aux | grep /bin/bash | grep root
+   98  history
+   99  sudo unshare -p -f --mount-proc=$PWD/rootfs/proc     chroot rootfs /bin/bash
+  100  ps aux | grep /bin/bash | grep root
+  101  sudo unshare -p -f --mount-proc=$PWD/rootfs/proc     chroot rootfs /bin/bash
+  102  history
+  103  sudo mkdir readonlyfiles
+  104  echo "hello" > readonlyfiles/hi.txt
+  105  ls readonlyfiles/
+  106  sudo echo "hello" > readonlyfiles/hi.txt
+  107  touch readonlyfiles/hi.txt
+  108  rm readonlyfiles/
+  109  rm readonlyfiles/ -r
+  110  ls
+  111  rm readonlyfiles -rf
+  112  mkdir readonlyfiles
+  113  sudo echo "hello" > readonlyfiles/hi.txt
+  114  cat readonlyfiles/hi.txt 
+  115  mkdir -p rootfs/var/readonlyfiles
+  116  sudo mkdir -p rootfs/var/readonlyfiles
+  117  sudo mount --bind -o ro $PWD/readonlyfiles $PWD/rootfs/var/readonlyfiles
+  118  sudo chroot rootfs /bin/bash 
+  119  history
+  120  cat ~/.bash_history 
+  121  history > part1.txt

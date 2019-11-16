@@ -2,11 +2,14 @@ from flask import Flask, request
 import os
 import os.path as osp
 import json
+from collections import Counter
 
 app = Flask(__name__)
 
 root_dir = osp.dirname(osp.realpath(__file__))
 config_dir = osp.join(root_dir, 'configs')
+container_dir = osp.join(root_dir, 'containers')
+instance_counter = Counter()
 
 
 @app.route('/config', methods=['POST'])
@@ -45,7 +48,17 @@ def list_config_files():
 
 @app.route('/launch', methods=['POST'])
 def launch_container():
-    pass
+    create_dir_if_not_exists(container_dir)
+    payload = request.get_json(silent=True)
+    if payload is None:
+        return '', 409
+    for field in ['name', 'major', 'minor']:
+        if field not in payload:
+            return '', 409
+    if osp.exists(osp.join(config_dir, '{}-{}-{}.cfg'.format(payload['name'],
+                                                             payload['major'],
+                                                             payload['minor']))):
+        return '', 409
 
 
 @app.route('/list', methods=['GET'])
@@ -53,8 +66,13 @@ def list_instances():
     pass
 
 
+def create_dir_if_not_exists(dir_path):
+    if not osp.exists(dir_path):
+        os.makedirs(dir_path)
+
+
 if __name__ == '__main__':
     os.chdir(root_dir)
-    if not osp.exists(config_dir):
-        os.makedirs(config_dir)
+    create_dir_if_not_exists(config_dir)
+    create_dir_if_not_exists(container_dir)
     app.run(host='localhost', port=8080)

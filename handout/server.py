@@ -19,6 +19,14 @@ def create_config_file():
     return '', 200
 
 
+@app.route('/cfginfo', methods=['GET'])
+def list_config_files():
+    res = {
+        'files': os.listdir(config_dir)
+    }
+    return res, 200
+
+
 if __name__ == '__main__':
     os.chdir(root_dir)
     if not osp.exists(config_dir):

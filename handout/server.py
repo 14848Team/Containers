@@ -2,7 +2,7 @@ from flask import Flask, request
 import os
 import os.path as osp
 import json
-from collections import Counter
+from collections import Counter, OrderedDict
 
 app = Flask(__name__)
 
@@ -10,6 +10,7 @@ root_dir = osp.dirname(osp.realpath(__file__))
 config_dir = osp.join(root_dir, 'configs')
 container_dir = osp.join(root_dir, 'containers')
 instance_counter = Counter()
+instances = OrderedDict()
 
 
 @app.route('/config', methods=['POST'])
@@ -55,15 +56,31 @@ def launch_container():
     for field in ['name', 'major', 'minor']:
         if field not in payload:
             return '', 409
-    if osp.exists(osp.join(config_dir, '{}-{}-{}.cfg'.format(payload['name'],
-                                                             payload['major'],
-                                                             payload['minor']))):
+    config_name = payload['name']
+    major = payload['major']
+    minor = payload['minor']
+    if not osp.exists(osp.join(config_dir, '{}-{}-{}.cfg'.format(config_name,
+                                                                 major,
+                                                                 minor))):
         return '', 409
+    instance_counter.update([config_name])
+    instance_name = '{}_{}'.format(config_name, instance_counter[config_name])
+    res = {
+        'instance': instance_name,
+        'name': config_name,
+        'major': major,
+        'minor': minor,
+    }
+    instances[instance_name] = res
+    return res, 200
 
 
 @app.route('/list', methods=['GET'])
 def list_instances():
-    pass
+    res = {
+        'instances': list(instances.values())
+    }
+    return res, 200
 
 
 def create_dir_if_not_exists(dir_path):

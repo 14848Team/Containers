@@ -3,6 +3,7 @@ import os
 import os.path as osp
 import json
 from collections import Counter, OrderedDict
+from multiprocessing import Process
 
 app = Flask(__name__)
 
@@ -11,6 +12,7 @@ config_dir = osp.join(root_dir, 'configs')
 container_dir = osp.join(root_dir, 'containers')
 instance_counter = Counter()
 instances = OrderedDict()
+subprocess_dict = {}
 
 
 @app.route('/config', methods=['POST'])
@@ -75,6 +77,15 @@ def launch_container():
     instance_dir = osp.join(container_dir, instance_name)
     os.makedirs(instance_dir)
     os.system('tar -zxf base_images/basefs.tar.gz -C {}'.format(instance_dir))
+    image_dir = osp.join(instance_dir, 'basefs')
+    with open(osp.join(config_dir, '{}-{}-{}.cfg'.format(config_name,
+                                                         major,
+                                                         minor))) as fp:
+        config_obj = json.load(fp)
+
+    subprocess = Process(target=start_container, args=(image_dir, config_obj))
+    subprocess_dict[instance_name] = subprocess
+    subprocess.start()
     return res, 200
 
 
@@ -105,6 +116,12 @@ def destroy_all():
 def create_dir_if_not_exists(dir_path):
     if not osp.exists(dir_path):
         os.makedirs(dir_path)
+
+
+def start_container(image_dir, config_obj):
+    os.chroot(image_dir)
+    os.chdir('/')
+    os.system('export {}'.format(config_obj['startup_env']))
 
 
 if __name__ == '__main__':

@@ -85,20 +85,21 @@ def list_instances():
     }
     return res, 200
 
-@app.route('/destroy/<instance_name>',  methods = ['DELETE'])
+
+@app.route('/destroy/<instance_name>', methods=['DELETE'])
 def destroy_a_running_instance(instance_name):
     print(instance_name)
     if instance_name not in instances:
         return "", 404
 
     del instances[instance_name]
-    return "",200
+    return "", 200
 
-@app.route('/destroyall', methods = ['DELETE'])
+
+@app.route('/destroyall', methods=['DELETE'])
 def destroy_all():
     instances.clear()
-    return "",200
-
+    return "", 200
 
 
 def create_dir_if_not_exists(dir_path):

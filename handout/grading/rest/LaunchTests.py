@@ -88,7 +88,7 @@ class LaunchTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIsNotNone(response.content)
 
-        expected["instances"].pop()  # remove first
+        expected["instances"].pop(0)  # remove first
         response = requests.get(url_list)
         self.assertEqual(response.status_code, 200)
         self.assertIsNotNone(response.content)
@@ -101,8 +101,8 @@ class LaunchTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIsNotNone(response.content)
 
-        expected["instances"].pop()  # remove second
-        expected["instances"].pop()  # remove third
+        expected["instances"].pop(0)  # remove second
+        expected["instances"].pop(0)  # remove third
         response = requests.get(url_list)
         self.assertEqual(response.status_code, 200)
         self.assertIsNotNone(response.content)

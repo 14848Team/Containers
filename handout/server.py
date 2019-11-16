@@ -12,7 +12,7 @@ config_dir = osp.join(root_dir, 'configs')
 @app.route('/config', methods=['POST'])
 def create_config_file():
     config_obj = request.get_json()
-    config_path = osp.join('configs', '{}.cfg'.format(config_obj['name']))
+    config_path = osp.join(config_dir, '{}.cfg'.format(config_obj['name']))
     if not osp.exists(config_path):
         with open(config_path, 'w') as fp:
             fp.write(request.data.decode('utf-8'))

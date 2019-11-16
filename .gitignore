@@ -1,2 +1,4 @@
 .idea
 /handout/base_images
+venv
+/handout/configs

@@ -43,6 +43,16 @@ def list_config_files():
     return res, 200
 
 
+@app.route('/launch', methods=['POST'])
+def launch_container():
+    pass
+
+
+@app.route('/list', methods=['GET'])
+def list_instances():
+    pass
+
+
 if __name__ == '__main__':
     os.chdir(root_dir)
     if not osp.exists(config_dir):

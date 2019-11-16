@@ -1,6 +1,7 @@
 import requests, unittest, json
 from MySupport import MySupport
 
+
 class ContainerTests(unittest.TestCase):
     HOSTNAME = "host"
     PORT = 80
@@ -11,7 +12,7 @@ class ContainerTests(unittest.TestCase):
         return suite
 
     def test_main(self):
-        url =  MySupport.url(self.HOSTNAME, self.PORT, "/launch")
+        url = MySupport.url(self.HOSTNAME, self.PORT, "/launch")
 
         # launch first
         first_config = MySupport.get_dict("first_config")
@@ -66,4 +67,3 @@ class ContainerTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIsNotNone(response.content)
         self.assertEqual(response.content.decode("utf-8").strip(), "my cabbages!")
-

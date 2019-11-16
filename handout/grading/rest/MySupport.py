@@ -20,7 +20,7 @@ class MySupport:
                 "startup_owner": "root",
                 "startup_env": "PORT=8080;LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/var/lib"
             }
-        
+
         elif which == "first_config":
             return {
                 "name": "sensiblename",
@@ -34,14 +34,14 @@ class MySupport:
                 "startup_owner": "root",
                 "startup_env": "PORT=10000;LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/var/lib"
             }
-        
+
         elif which == "first_launch":
             return {
                 "name": "sensiblename",
                 "major": "1",
                 "minor": "01"
             }
-        
+
         elif which == "second_config":
             return {
                 "name": "terriblename",
@@ -56,14 +56,14 @@ class MySupport:
                 "startup_owner": "root",
                 "startup_env": "PORT=20000;LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/var/lib"
             }
-        
+
         elif which == "second_launch":
             return {
                 "name": "terriblename",
                 "major": "5",
                 "minor": "23",
             }
-        
+
         elif which == "third_config":
             return {
                 "name": "terriblename",
@@ -88,4 +88,3 @@ class MySupport:
             }
         else:
             return {}
-

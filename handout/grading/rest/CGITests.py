@@ -1,6 +1,7 @@
 import requests, unittest, json
 from MySupport import MySupport
 
+
 class CGITests(unittest.TestCase):
     HOSTNAME = "host"
     PORT = 80
@@ -44,7 +45,8 @@ class CGITests(unittest.TestCase):
             url = MySupport.url("localhost", "10000", "/cgi-bin/ps.sh")
             response = requests.get(url)
             self.fail("Server 1 should be dead")
-        except requests.ConnectionError as e: pass
+        except requests.ConnectionError as e:
+            pass
 
         # check second
         url = MySupport.url("localhost", "20000", "/cgi-bin/ps.sh")
@@ -59,5 +61,3 @@ class CGITests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIsNotNone(response.content)
         self.assertEqual(response.content.decode("utf-8").count("tiny"), 1)
-
-

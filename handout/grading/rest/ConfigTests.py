@@ -1,9 +1,10 @@
 import requests, unittest, json
 from MySupport import MySupport
 
+
 class ConfigTests(unittest.TestCase):
-    HOSTNAME = "host"
-    PORT = 80
+    HOSTNAME = "localhost"
+    PORT = 8080
 
     def suite():
         suite = unittest.TestSuite()
@@ -13,7 +14,7 @@ class ConfigTests(unittest.TestCase):
         return suite
 
     def test_invalid(self):
-        url =  MySupport.url(self.HOSTNAME, self.PORT, "/config")
+        url = MySupport.url(self.HOSTNAME, self.PORT, "/config")
 
         # create - not JSON
         response = requests.post(url, data="omgwtfbbq")
@@ -26,11 +27,11 @@ class ConfigTests(unittest.TestCase):
         self.assertFalse(response.content)
 
     def test_config(self):
-        url =  MySupport.url(self.HOSTNAME, self.PORT, "/config")
-        url_info=  MySupport.url(self.HOSTNAME, self.PORT, "/cfginfo")
+        url = MySupport.url(self.HOSTNAME, self.PORT, "/config")
+        url_info = MySupport.url(self.HOSTNAME, self.PORT, "/cfginfo")
 
         expected = {
-             "files": []
+            "files": []
         }
 
         # get cfg info - empty
@@ -66,7 +67,6 @@ class ConfigTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIsNotNone(response.content)
 
-
         expected["files"].append("sensiblename-1-01.cfg")
         expected["files"].append("terriblename-5-23.cfg")
         expected["files"].append("terriblename-5-78.cfg")
@@ -75,3 +75,6 @@ class ConfigTests(unittest.TestCase):
         self.assertEqual(json, expected)
 
 
+if __name__ == '__main__':
+    runner = unittest.TextTestRunner()
+    runner.run(ConfigTests.suite())

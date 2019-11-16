@@ -4,6 +4,7 @@ from LaunchTests import LaunchTests
 from ContainerTests import ContainerTests
 from CGITests import CGITests
 
+
 def run_full(hostname, port):
     total = 0
     results = []
@@ -30,8 +31,8 @@ def run_full(hostname, port):
 
     return total
 
+
 if __name__ == "__main__":
     hostname = "localhost"
     port = "8080"
     run_full(hostname, port)
-

@@ -1,6 +1,7 @@
 import requests, unittest, json
 from MySupport import MySupport
 
+
 class LaunchTests(unittest.TestCase):
     HOSTNAME = "host"
     PORT = 80
@@ -11,8 +12,8 @@ class LaunchTests(unittest.TestCase):
         return suite
 
     def test_main(self):
-        url_launch =  MySupport.url(self.HOSTNAME, self.PORT, "/launch")
-        url_list =  MySupport.url(self.HOSTNAME, self.PORT, "/list")
+        url_launch = MySupport.url(self.HOSTNAME, self.PORT, "/launch")
+        url_list = MySupport.url(self.HOSTNAME, self.PORT, "/list")
 
         data = {}
 
@@ -76,18 +77,18 @@ class LaunchTests(unittest.TestCase):
         self.assertEqual(json, expected)
 
         # test single destroy - not exist
-        url_destroy =  MySupport.url(self.HOSTNAME, self.PORT, "/destroy/nope")
+        url_destroy = MySupport.url(self.HOSTNAME, self.PORT, "/destroy/nope")
         response = requests.delete(url_destroy)
         self.assertEqual(response.status_code, 404)
         self.assertFalse(response.content)
 
         # test single destroy - first
-        url_destroy =  MySupport.url(self.HOSTNAME, self.PORT, "/destroy/" + first_data["instance"])
+        url_destroy = MySupport.url(self.HOSTNAME, self.PORT, "/destroy/" + first_data["instance"])
         response = requests.delete(url_destroy)
         self.assertEqual(response.status_code, 200)
         self.assertIsNotNone(response.content)
 
-        expected["instances"].pop() # remove first
+        expected["instances"].pop()  # remove first
         response = requests.get(url_list)
         self.assertEqual(response.status_code, 200)
         self.assertIsNotNone(response.content)
@@ -95,17 +96,15 @@ class LaunchTests(unittest.TestCase):
         self.assertEqual(json, expected)
 
         # test destroy all
-        url_destroy =  MySupport.url(self.HOSTNAME, self.PORT, "/destroyall")
+        url_destroy = MySupport.url(self.HOSTNAME, self.PORT, "/destroyall")
         response = requests.delete(url_destroy)
         self.assertEqual(response.status_code, 200)
         self.assertIsNotNone(response.content)
 
-        expected["instances"].pop() # remove second
-        expected["instances"].pop() # remove third
+        expected["instances"].pop()  # remove second
+        expected["instances"].pop()  # remove third
         response = requests.get(url_list)
         self.assertEqual(response.status_code, 200)
         self.assertIsNotNone(response.content)
         json = response.json()
         self.assertEqual(json, expected)
-
-

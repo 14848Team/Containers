@@ -3,3 +3,4 @@
 venv
 /handout/configs
 *.pyc
+containers

@@ -72,6 +72,9 @@ def launch_container():
         'minor': minor,
     }
     instances[instance_name] = res
+    instance_dir = osp.join(container_dir, instance_name)
+    os.makedirs(instance_dir)
+    os.system('tar -zxf base_images/basefs.tar.gz -C {}'.format(instance_dir))
     return res, 200
 
 

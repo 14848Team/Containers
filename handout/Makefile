@@ -12,7 +12,8 @@ manager:
 clean:
 	# Remove all config files stored by the manager in it's lifetime
 	# and kill the manager process
-	rm -r configs
+	rm -rf configs
+	rm -rf containers
 
 cli_tests: clean manager
 	./grading/cli_tests/test_1_upload.sh

@@ -1,3 +1,10 @@
 #!/usr/bin/python3
 
-exit(0)
+import shutil
+import sys
+import os.path as osp
+
+if __name__ == '__main__':
+    config_dir = osp.join(osp.dirname(osp.realpath(__file__)), '../configs')
+    upload_filepath = sys.argv[1]
+    shutil.copy(upload_filepath, config_dir)

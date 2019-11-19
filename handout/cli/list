@@ -1,4 +1,11 @@
 #!/usr/bin/python3
 
-print("fake instance name")
-print("another fake instance name")
+import os
+import os.path as osp
+
+if __name__ == '__main__':
+    container_dir = osp.join(osp.dirname(osp.realpath(__file__)), '../containers')
+    if osp.exists(container_dir):
+        instance_names = os.listdir(container_dir)
+        for instance_name in instance_names:
+            print(instance_name)

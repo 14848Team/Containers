@@ -40,6 +40,7 @@ def create_config_file():
     if not osp.exists(config_path):
         with open(config_path, 'w') as fp:
             fp.write(request.data.decode('utf-8'))
+        unlock(config_path)
         return '', 200
     else:
         return '', 409
@@ -80,6 +81,7 @@ def launch_container():
     instances[instance_name] = res
     instance_dir = osp.join(container_dir, instance_name)
     os.makedirs(instance_dir)
+    unlock(instance_dir)
     os.system('tar -zxf base_images/basefs.tar.gz -C {}'.format(instance_dir))
     image_dir = osp.join(instance_dir, 'basefs')
     with open(osp.join(config_dir, '{}-{}-{}.cfg'.format(config_name,
@@ -93,7 +95,7 @@ def launch_container():
     container_dict[instance_name] = container_process
     container_process.start()
     os.setpgid(container_process.pid, container_process.pid)
-    time.sleep(1)
+    time.sleep(3)
     return res, 200
 
 
@@ -154,6 +156,11 @@ def teardown_container(instance_name):
 def create_dir_if_not_exists(dir_path):
     if not osp.exists(dir_path):
         os.makedirs(dir_path)
+    unlock(dir_path)
+
+
+def unlock(path):
+    os.system('sudo chmod 777 {}'.format(path))
 
 
 def start_container(image_dir, config_obj):

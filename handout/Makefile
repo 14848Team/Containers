@@ -17,6 +17,8 @@ clean:
 	rm -rf mountables/tomato
 	rm -rf configs
 	rm -rf containers
+	rm -f index*
+	rm -f grading/cli_tests/obtained*
 
 cli_tests: clean manager
 	./grading/cli_tests/test_1_upload.sh

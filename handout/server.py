@@ -131,7 +131,7 @@ def ps():
 def teardown_container(instance_name):
     image_dir = osp.join(container_dir, instance_name, 'basefs')
     instance_info = instances.pop(instance_name)
-    container_process: Process = container_dict.pop(instance_name)
+    container_process = container_dict.pop(instance_name)
     os.killpg(container_process.pid, signal.SIGKILL)
 
     with open(osp.join(config_dir, '{}-{}-{}.cfg'.format(instance_info['name'],

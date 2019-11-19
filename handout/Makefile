@@ -12,6 +12,9 @@ manager:
 clean:
 	# Remove all config files stored by the manager in it's lifetime
 	# and kill the manager process
+	rm -rf mountables/cabbage
+	rm -rf mountables/potato
+	rm -rf mountables/tomato
 	rm -rf configs
 	rm -rf containers
 

@@ -2,8 +2,12 @@ from flask import Flask, request
 import os
 import os.path as osp
 import json
+import copy
+import time
 from collections import Counter, OrderedDict
 from multiprocessing import Process
+
+import signal
 
 app = Flask(__name__)
 
@@ -12,7 +16,7 @@ config_dir = osp.join(root_dir, 'configs')
 container_dir = osp.join(root_dir, 'containers')
 instance_counter = Counter()
 instances = OrderedDict()
-subprocess_dict = {}
+container_dict = {}
 
 
 @app.route('/config', methods=['POST'])
@@ -82,11 +86,14 @@ def launch_container():
                                                          major,
                                                          minor))) as fp:
         config_obj = json.load(fp)
-    for mount_argv in config_obj["mounts"]:
+    for mount_argv in config_obj['mounts']:
         execute_mount(mount_argv, image_dir)
-    subprocess = Process(target=start_container, args=(image_dir, config_obj))
-    subprocess_dict[instance_name] = subprocess
-    subprocess.start()
+    os.system('mount -t proc proc {}'.format(osp.join(image_dir, 'proc')))
+    container_process = Process(target=start_container, args=(image_dir, config_obj))
+    container_dict[instance_name] = container_process
+    container_process.start()
+    os.setpgid(container_process.pid, container_process.pid)
+    time.sleep(1)
     return res, 200
 
 
@@ -100,18 +107,48 @@ def list_instances():
 
 @app.route('/destroy/<instance_name>', methods=['DELETE'])
 def destroy_a_running_instance(instance_name):
-    print(instance_name)
+    print('destroy {}'.format(instance_name))
     if instance_name not in instances:
         return "", 404
-
-    del instances[instance_name]
+    teardown_container(instance_name)
     return "", 200
 
 
 @app.route('/destroyall', methods=['DELETE'])
 def destroy_all():
-    instances.clear()
+    instance_names = copy.copy(list(instances.keys()))
+    for instance_name in instance_names:
+        teardown_container(instance_name)
     return "", 200
+
+
+@app.route('/ps', methods=['GET'])
+def ps():
+    return {instance_name: container_dict[instance_name].pid
+            for instance_name in container_dict}, 200
+
+
+def teardown_container(instance_name):
+    image_dir = osp.join(container_dir, instance_name, 'basefs')
+    instance_info = instances.pop(instance_name)
+    container_process: Process = container_dict.pop(instance_name)
+    os.killpg(container_process.pid, signal.SIGKILL)
+
+    with open(osp.join(config_dir, '{}-{}-{}.cfg'.format(instance_info['name'],
+                                                         instance_info['major'],
+                                                         instance_info['minor']))) as fp:
+        config_obj = json.load(fp)
+
+    mount_paths = [mount_config.split(' ')[1] for mount_config in config_obj['mounts']]
+    mount_paths.sort()
+    mount_paths.reverse()
+    for mount_path in mount_paths:
+        if mount_path[0] == '/':
+            mount_path = mount_path[1:]
+        mount_path = osp.join(image_dir, mount_path)
+        os.system('umount -l {}'.format(mount_path))
+    os.system('chroot {} /bin/bash -c "umount proc"'.format(image_dir))
+    os.system('rm -rf {}'.format(osp.join(container_dir, instance_name)))
 
 
 def create_dir_if_not_exists(dir_path):
@@ -120,33 +157,39 @@ def create_dir_if_not_exists(dir_path):
 
 
 def start_container(image_dir, config_obj):
-    os.chroot(image_dir)
-    os.chdir('/')
-    os.system('export {}'.format(config_obj['startup_env']))
+    startup_env = config_obj['startup_env']
+    if startup_env[-1] != ';':
+        startup_env = startup_env + ';'
+    os.system('unshare -p -f --mount-proc={} chroot {} /bin/bash -c "export {} {}"'.format(osp.join(image_dir, 'proc'),
+                                                                                           image_dir, startup_env,
+                                                                                           config_obj[
+                                                                                               'startup_script']))
+
 
 def execute_mount(mount_argv, image_dir):
-    file = mount_argv.split(" ")[0]
-    file_floder = file.split(".")[0]
-    floder = mount_argv.split(" ")[1]
+    filename = mount_argv.split(" ")[0]
+    file_folder = filename.split(".")[0]
+    folder = mount_argv.split(" ")[1]
+    if folder[0] == '/':
+        folder = folder[1:]
     access = mount_argv.split(" ")[2]
     mountables_path = osp.join(os.getcwd(), "mountables")
-    file_path = osp.join(mountables_path, file)
-    file_floder_path = osp.join(mountables_path, file_floder)
-    floder_path = osp.join(image_dir, floder)
-    if not osp.exists(floder_path):
-        os.system('sudo mkdir {}'.format(floder_path))
-    if not osp.exists(file_floder_path):
+    file_path = osp.join(mountables_path, filename)
+    file_folder = osp.join(mountables_path, file_folder)
+    folder_path = osp.join(image_dir, folder)
+    if not osp.exists(folder_path):
+        os.system('sudo mkdir {}'.format(folder_path))
+    if not osp.exists(file_folder):
         os.system('tar -xf {} -C {}'.format(file_path, mountables_path))
     if access == "READ":
-        os.system('sudo mount --bind -o ro {} {}'.format(file_floder_path, floder_path))
+        os.system('sudo mount --bind -o ro {} {}'.format(file_folder, folder_path))
     else:
-        os.system('sudo mount --bind -o rw {} {}'.format(file_floder_path, floder_path))
-
-
+        os.system('sudo mount --bind -o rw {} {}'.format(file_folder, folder_path))
 
 
 if __name__ == '__main__':
     os.chdir(root_dir)
+    os.system('make clean')
     create_dir_if_not_exists(config_dir)
     create_dir_if_not_exists(container_dir)
     app.run(host='localhost', port=8080)

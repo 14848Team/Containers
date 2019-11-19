@@ -21,21 +21,21 @@ class CGITests(unittest.TestCase):
         response = requests.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertIsNotNone(response.content)
-        self.assertEqual(response.content.decode("utf-8").count("tiny"), 1)
+        self.assertEqual(response.content.decode("utf-8").count("tiny"), 2)
 
         # check second
         url = MySupport.url("localhost", "20000", "/cgi-bin/ps.sh")
         response = requests.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertIsNotNone(response.content)
-        self.assertEqual(response.content.decode("utf-8").count("tiny"), 1)
+        self.assertEqual(response.content.decode("utf-8").count("tiny"), 2)
 
         # check third
         url = MySupport.url("localhost", "30000", "/cgi-bin/ps.sh")
         response = requests.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertIsNotNone(response.content)
-        self.assertEqual(response.content.decode("utf-8").count("tiny"), 1)
+        self.assertEqual(response.content.decode("utf-8").count("tiny"), 2)
 
         # kill server 1
         url = MySupport.url("localhost", "10000", "/cgi-bin/pkill.sh")
@@ -53,11 +53,11 @@ class CGITests(unittest.TestCase):
         response = requests.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertIsNotNone(response.content)
-        self.assertEqual(response.content.decode("utf-8").count("tiny"), 1)
+        self.assertEqual(response.content.decode("utf-8").count("tiny"), 2)
 
         # check third
         url = MySupport.url("localhost", "30000", "/cgi-bin/ps.sh")
         response = requests.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertIsNotNone(response.content)
-        self.assertEqual(response.content.decode("utf-8").count("tiny"), 1)
+        self.assertEqual(response.content.decode("utf-8").count("tiny"), 2)

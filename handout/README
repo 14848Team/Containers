@@ -12,3 +12,7 @@ grading/rest
 
 grading/cli_tests
  - contains the grading scripts which uses the CLI to test your system
+
+server.py
+ - the container manager
+ 

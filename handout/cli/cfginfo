@@ -1,5 +1,15 @@
 #!/usr/bin/python3
 
-print("tiny-1-1.cfg")
-print("tiny-2-2.cfg")
-print("tiny-3-3.cfg")
+import requests
+
+HOSTNAME = "localhost"
+PORT = "8080"
+
+url = "http://" + HOSTNAME + ":" + PORT + "/cfginfo"
+
+response = requests.get(url)
+
+if(response.status_code == 200):
+    return_data = response.json()
+    for confile in return_data["files"]:
+        print(confile)

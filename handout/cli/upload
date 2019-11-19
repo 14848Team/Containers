@@ -1,10 +1,15 @@
 #!/usr/bin/python3
 
-import shutil
 import sys
-import os.path as osp
+import json
+import requests
+
+HOSTNAME = "localhost"
+PORT = "8080"
 
 if __name__ == '__main__':
-    config_dir = osp.join(osp.dirname(osp.realpath(__file__)), '../configs')
+    url = "http://" + HOSTNAME + ":" + PORT + "/config"
     upload_filepath = sys.argv[1]
-    shutil.copy(upload_filepath, config_dir)
+    with open(upload_filepath, 'r') as fp:
+        config_obj = json.load(fp)
+    resp = requests.post(url, json=config_obj)

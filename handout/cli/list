@@ -1,11 +1,13 @@
 #!/usr/bin/python3
 
-import os
-import os.path as osp
+import requests
+
+HOSTNAME = "localhost"
+PORT = "8080"
+
 
 if __name__ == '__main__':
-    container_dir = osp.join(osp.dirname(osp.realpath(__file__)), '../containers')
-    if osp.exists(container_dir):
-        instance_names = os.listdir(container_dir)
-        for instance_name in instance_names:
-            print(instance_name)
+    url = "http://" + HOSTNAME + ":" + PORT + "/list"
+    instances = requests.get(url).json()['instances']
+    for instance in instances:
+        print(instance['instance'])

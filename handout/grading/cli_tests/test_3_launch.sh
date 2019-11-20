@@ -1,4 +1,4 @@
-#!/bin/bash
+ff#!/bin/bash
 
 echo ""
 echo "..........................."

@@ -1,3 +1,17 @@
+"""
+Author:
+    Can Xia (canx)
+    Chi Zhang (czhang5)
+
+Implement several manipulations in container manager, including
+ creating configuration file, listing existing configuration files, launching a
+ instance, listing running instance, destroying a instance, and
+ destroying all instances
+
+This server basally use Flask as the http server to listen on http
+request. The command "make manager" can run this server.
+"""
+
 from flask import Flask, request
 import os
 import os.path as osp
@@ -21,6 +35,9 @@ container_dict = {}
 
 @app.route('/config', methods=['POST'])
 def create_config_file():
+    """
+    Create a configuration file
+    """
     if not osp.exists(config_dir):
         os.makedirs(config_dir)
     config_obj = request.get_json(silent=True)
@@ -48,6 +65,9 @@ def create_config_file():
 
 @app.route('/cfginfo', methods=['GET'])
 def list_config_files():
+    """
+    List all configuration files
+    """
     res = {
         'files': sorted(os.listdir(config_dir))
     }
@@ -56,6 +76,9 @@ def list_config_files():
 
 @app.route('/launch', methods=['POST'])
 def launch_container():
+    """
+    Launch a container
+    """
     create_dir_if_not_exists(container_dir)
     payload = request.get_json(silent=True)
     if payload is None:
@@ -79,21 +102,26 @@ def launch_container():
         'minor': minor,
     }
     instances[instance_name] = res
+    # Create floder
     instance_dir = osp.join(container_dir, instance_name)
     os.makedirs(instance_dir)
     unlock(instance_dir)
+    # Untar the basic image
     os.system('tar -zxf base_images/basefs.tar.gz -C {}'.format(instance_dir))
     image_dir = osp.join(instance_dir, 'basefs')
     with open(osp.join(config_dir, '{}-{}-{}.cfg'.format(config_name,
                                                          major,
                                                          minor))) as fp:
         config_obj = json.load(fp)
+    # Mount
     for mount_argv in config_obj['mounts']:
         execute_mount(mount_argv, image_dir)
     os.system('mount -t proc proc {}'.format(osp.join(image_dir, 'proc')))
+    # Create child process and start instance
     container_process = Process(target=start_container, args=(image_dir, config_obj))
     container_dict[instance_name] = container_process
     container_process.start()
+    # Set group id
     os.setpgid(container_process.pid, container_process.pid)
     time.sleep(3)
     return res, 200

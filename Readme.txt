@@ -2,6 +2,8 @@ The floder "venv" is the virtual environment which includes all the python libra
 The floder "handout" contains our source code.
 The file "part1.txt" includes commands history we have entered to establish a container 
 
+Tip: Some commands in makefile use "sudo", please enter the password if there's a prompt
+
 To test rest api:
 
     1. make manager

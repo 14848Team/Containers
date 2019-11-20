@@ -137,6 +137,12 @@ def list_instances():
 
 @app.route('/destroy/<instance_name>', methods=['DELETE'])
 def destroy_a_running_instance(instance_name):
+    """
+    Given a running container instance's name, destroy it.
+    :param instance_name: the running instance's name
+    :return: nothing in response body, if there is no instance matches the given name,
+            response status code is 404, else 200
+    """
     print('destroy {}'.format(instance_name))
     if instance_name not in instances:
         return "", 404
@@ -146,6 +152,10 @@ def destroy_a_running_instance(instance_name):
 
 @app.route('/destroyall', methods=['DELETE'])
 def destroy_all():
+    """
+    destroy all running container instances
+    :return: a http response body with empty body and 200 status code
+    """
     instance_names = copy.copy(list(instances.keys()))
     for instance_name in instance_names:
         teardown_container(instance_name)
@@ -154,21 +164,32 @@ def destroy_all():
 
 @app.route('/ps', methods=['GET'])
 def ps():
+    """
+    helper function, list all subprocesses' pid created for containers
+    :return: a http response body with body contains all a dict listing
+                all running instances' names and their pid
+    """
     return {instance_name: container_dict[instance_name].pid
             for instance_name in container_dict}, 200
 
 
 def teardown_container(instance_name):
+    """
+    do the cleanup job for destroy a container instance
+    :param instance_name: the name of destroyed container instance
+    :return: None
+    """
     image_dir = osp.join(container_dir, instance_name, 'basefs')
     instance_info = instances.pop(instance_name)
     container_process = container_dict.pop(instance_name)
+    # kill the whole group of container process
     os.killpg(container_process.pid, signal.SIGKILL)
 
     with open(osp.join(config_dir, '{}-{}-{}.cfg'.format(instance_info['name'],
                                                          instance_info['major'],
                                                          instance_info['minor']))) as fp:
         config_obj = json.load(fp)
-
+    # umount all mounted files
     mount_paths = [mount_config.split(' ')[1] for mount_config in config_obj['mounts']]
     mount_paths.sort()
     mount_paths.reverse()
@@ -177,21 +198,39 @@ def teardown_container(instance_name):
             mount_path = mount_path[1:]
         mount_path = osp.join(image_dir, mount_path)
         os.system('umount -l {}'.format(mount_path))
+    # umount proc
     os.system('chroot {} /bin/bash -c "umount proc"'.format(image_dir))
+    # remove container directory
     os.system('rm -rf {}'.format(osp.join(container_dir, instance_name)))
 
 
 def create_dir_if_not_exists(dir_path):
+    """
+    create a directory if not exists
+    :param dir_path: the directory path
+    :return: None
+    """
     if not osp.exists(dir_path):
         os.makedirs(dir_path)
     unlock(dir_path)
 
 
 def unlock(path):
+    """
+    Make a file or directory accessible to all users
+    :param path: the path of the unlocked file or directory
+    :return: None
+    """
     os.system('sudo chmod 777 {}'.format(path))
 
 
 def start_container(image_dir, config_obj):
+    """
+    The container subprocess
+    :param image_dir: container's image directory
+    :param config_obj: config object
+    :return: None
+    """
     startup_env = config_obj['startup_env']
     if startup_env[-1] != ';':
         startup_env = startup_env + ';'
@@ -202,6 +241,12 @@ def start_container(image_dir, config_obj):
 
 
 def execute_mount(mount_argv, image_dir):
+    """
+    Mount files to the container image directory
+    :param mount_argv: all mount config arguments
+    :param image_dir: the path of container image directory
+    :return: None
+    """
     filename = mount_argv.split(" ")[0]
     file_folder = filename.split(".")[0]
     folder = mount_argv.split(" ")[1]

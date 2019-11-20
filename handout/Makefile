@@ -33,5 +33,3 @@ api_tests: clean
 	python3 grading/rest/grading.py 
 	sudo ./cli/destroyall
 	sudo make clean
-
-	

@@ -37,6 +37,7 @@ container_dict = {}
 def create_config_file():
     """
     Create a configuration file
+    :returns: Return 200 if success, return 409 if the json is wrong
     """
     if not osp.exists(config_dir):
         os.makedirs(config_dir)
@@ -67,6 +68,7 @@ def create_config_file():
 def list_config_files():
     """
     List all configuration files
+    :returns: Return a list of configuration files
     """
     res = {
         'files': sorted(os.listdir(config_dir))
@@ -78,6 +80,8 @@ def list_config_files():
 def launch_container():
     """
     Launch a container
+    :return: Return the instance name and information if launching is
+    success. Return 409 if the configuration file is not existed.
     """
     create_dir_if_not_exists(container_dir)
     payload = request.get_json(silent=True)
@@ -129,6 +133,10 @@ def launch_container():
 
 @app.route('/list', methods=['GET'])
 def list_instances():
+    """
+    List all running instances
+    :return: A list of running instances
+    """
     res = {
         'instances': list(instances.values())
     }
